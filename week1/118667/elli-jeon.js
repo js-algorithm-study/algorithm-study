@@ -25,29 +25,20 @@
 
 */
 
-// arr에서는 pop시키고 그 element return
-function pop(arr) {
-  return arr.shift();
-}
-
-// arr 뒤에 element push
-function insert(arr, ele) {
-  arr.push(ele);
-}
-
-// pop and insert
-function work(popQueue, insertQueue) {
-  console.log(`from ${popQueue} / ${insertQueue}`);
-  const popped = pop(popQueue);
-  insert(insertQueue, popped);
-  console.log(`pop ${popped} and insert`);
-  console.log(`from ${popQueue} / ${insertQueue}`);
-  console.log("------");
-}
-
 // Sum of arr's elements
 function sum(arr) {
   return arr.reduce((prev, curr) => prev + curr, 0);
+}
+
+/**
+ * Get circular queue Index
+ * @param {array} queue
+ * @param {number} number
+ * @returns
+ */
+function getIndex(queue, number) {
+  const length = queue.length;
+  return number % length;
 }
 
 /**
@@ -69,21 +60,9 @@ function partialSum(arr, startIdx, amount) {
   }, 0);
 }
 
-/**
- * Get circular queue Index
- * @param {array} queue
- * @param {number} number
- * @returns
- */
-function getIndex(queue, number) {
-  const length = queue.length;
-  return number % length;
-}
-
 // 1개씩 모아서, 2개씩 모아서, 3개씩 모아서 ....
 function isPossible(queue1, queue2) {
   const merged = [...queue1, ...queue2];
-  const reverseMerged = [...queue2, ...queue1];
 
   const loop = Math.floor(merged.length / 2) + 1; // 집합 참여 수
   // console.log("loop", loop);
@@ -91,34 +70,15 @@ function isPossible(queue1, queue2) {
 
   const answerArr = [];
 
-  for (let i = 1; i <= loop; i++) {
-    for (let j = 0; j < merged.length; j++) {
-      const setSum = partialSum(merged, j, i);
-      if (setSum === halfSum) {
-        //console.log(`${i} is 참여 수, ${j} is start index, ${setSum}`);
-        //console.log(`merge에서 ${j}<= <${j + i}`);
-        const setResult = {
-          type: "merge",
-          start: j,
-          end: j + i,
-          arr: merged.slice(j, j + i),
-        };
-        answerArr.push(setResult);
-      }
-    }
-  }
+  for (let i = 0; i < merged.length; i++) {
+    for (let j = 1; j <= loop; j++) {
+      const groupSum = partialSum(merged, i, j);
 
-  for (let i = 1; i <= loop; i++) {
-    for (let j = 0; j < reverseMerged.length; j++) {
-      const setSum = partialSum(reverseMerged, j, i);
-      if (setSum === halfSum) {
-        //console.log(`${i} is 참여 수, ${j} is start index, ${setSum}`);
-        //console.log(`reversemerge에서 ${j}<= <${j + i}`);
+      if (groupSum === halfSum) {
         const setResult = {
-          type: "reverse",
-          start: j,
-          end: j + i,
-          arr: reverseMerged.slice(j, j + i),
+          start: i,
+          end: i + j,
+          arr: merged.slice(i, i + j),
         };
         answerArr.push(setResult);
       }
@@ -142,43 +102,43 @@ function findFastestWay(arr, queue1, queue2) {
   let count = Infinity;
 
   for (let each of arr) {
-    const { type, start, end, arr } = each;
-    // queue1 + queue2
-    if (type === "merge") {
-      const queueAEnd = queue1.length - 1;
-      const queueBEnd = queue1.length + queue2.length - 1;
-      // 첫번째 queue의 end가 우리가 고른 배열의 한 가운데에 있다면.
-      if (start <= queueAEnd && queueAEnd < end) {
-        // 서로 없는 것들 갯수
-        const qq =
-          queue1.filter((ele) => !arr.includes(ele)).length +
-          arr.filter((ele) => !queue1.includes(ele)).length;
-        if (qq < count) {
-          count = qq;
-        }
+    const { start, end, arr } = each;
+    console.log(each);
+
+    const queueAEnd = queue1.length - 1;
+    const queueBEnd = queue1.length + queue2.length - 1;
+
+    // 첫번째 queue의 end가 우리가 고른 배열의 한 가운데에 있다면.
+    if (start <= queueAEnd && queueAEnd < end) {
+      // 서로 없는 것들 갯수
+      const qq =
+        queue1.filter((ele) => !arr.includes(ele)).length +
+        arr.filter((ele) => !queue1.includes(ele)).length;
+
+      if (qq < count) {
+        count = qq;
+      }
+    } else {
+      // group 길이
+      const groupLength = arr.length;
+      // 자기 앞에 길이
+      let beforeGroupLength = 0;
+      // 상대 queue 길이 + 자기 앞에 길이
+      let otherQueueLength = 0;
+
+      if (start < queueAEnd) {
+        beforeGroupLength = start - 0;
+        otherQueueLength = queue2.length;
       } else {
-        // group 길이
-        const groupLength = arr.length;
-        // 자기 앞에 길이
-        let beforeGroupLength = 0;
-        // 상대 queue 길이 + 자기 앞에 길이
-        let otherQueueLength = 0;
-        if (start < groupLength) {
-          beforeGroupLength = start - 0;
-          otherQueueLength = queue2.length;
-        } else {
-          beforeGroupLength = start - queueAEnd - 1;
-          otherQueueLength = queue1.length;
-        }
-        //console.log(groupLength, beforeGroupLength, otherQueueLength);
-        const qq =
-          groupLength +
-          beforeGroupLength +
-          otherQueueLength +
-          beforeGroupLength;
-        if (qq < count) {
-          count = qq;
-        }
+        beforeGroupLength = start - queueAEnd - 1;
+        otherQueueLength = queue1.length;
+      }
+
+      const qq =
+        groupLength + beforeGroupLength + otherQueueLength + beforeGroupLength;
+
+      if (qq < count) {
+        count = qq;
       }
     }
   }
@@ -212,5 +172,6 @@ function solution(queue1, queue2) {
 
 console.log(solution([3, 2, 7, 2], [4, 6, 5, 1])); // 2
 console.log(solution([1, 2, 1, 2], [1, 10, 1, 2])); // 7
+console.log(solution([7, 5, 2], [3, 4, 9])); // 7
 // console.log(solution([1, 1], [1, 5])); // -1
 // console.log(solution([1, 1], [1, 2])); // -1
