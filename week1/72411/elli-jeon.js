@@ -1,6 +1,8 @@
 /*
 단품메뉴 -> 코스요리 (최소 두 개 이상의 단품, 최소 두 명 이상의 손님들로 부터 주문된 조합)
 
+A B C D => AB AC AD BC BD CD (조합!!)
+
 각 2개, 3개 등에서 가장 많이 뽑힌 메뉴가 있으면 그것만 넣고, 같은 횟수가 있으면 다 넣어줌
 
 ex) AB 4, BC 3 이면 AB만 ABC 2, BCD 2이면 둘다 넣어주기
@@ -8,23 +10,27 @@ ex) AB 4, BC 3 이면 AB만 ABC 2, BCD 2이면 둘다 넣어주기
 */
 
 function solution(orders, course) {
-  const result = [];
+  // 1. 가능한 음식 조합을 course 개수에 따라서 return
+  const possibleCombination = [];
 
   course.forEach((num) => {
-    const courseResult = [];
+    const courseCombination = [];
     orders.forEach((order) => {
+      // "AB" => ["A", "B"]
       const orderArr = order.split("");
       const combination = getCombination(orderArr, num);
+      // ["B", "A"] => "AB"
       const joined = combination.map((ele) => ele.sort().join(""));
-      courseResult.push(...joined);
+      courseCombination.push(...joined);
     });
-    result.push(courseResult);
+    possibleCombination.push(courseCombination);
   });
 
-  //console.log(result);
+  // ["ABCD", "ABC"] 2,3,4 => ["AB", "AC", "AD", "BC", "BD", "CD", "ABC", "ABCD"]
 
+  // 2. 음식 조합의 중복 count
   const counterResult = [];
-  result.forEach((menus) => {
+  possibleCombination.forEach((menus) => {
     const counter = {};
     menus.forEach((menu) => {
       counter[menu] = (counter[menu] || 0) + 1;
@@ -32,8 +38,9 @@ function solution(orders, course) {
     counterResult.push(counter);
   });
 
-  //console.log(counterResult);
+  // ["AB", "AC", "AD", "BC", "BD", "CD"] => {AB : 2, AC : 2, AD : 1, BC : 2, BD : 1, CD : 1, ABC : 2, ABCD : 1}
 
+  // 3. 2개 이상인 음식조합 중에서 가장 많이 나온 조합을 저장. 최대 선택 count가 같으면 배열에 계속 push
   const unsortedAnswer = [];
 
   counterResult.forEach((menus, index) => {
@@ -56,7 +63,12 @@ function solution(orders, course) {
     unsortedAnswer.push(...courseAnswer);
   });
 
+  // ["AB", "AC", "BC", "ABC"]
+
+  // 4. 마지막으로 오름차순 정렬
   const answer = unsortedAnswer.sort();
+
+  // ["AB", "ABC", "AC", "BC"]
 
   //console.log(answer);
 
@@ -69,7 +81,6 @@ function solution(orders, course) {
  * @param {number} select 몇개를 고를지 select 갯수
  * @returns 가능한 음식 조합
  */
-
 function getCombination(array, select) {
   const result = [];
 
