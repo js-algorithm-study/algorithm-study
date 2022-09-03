@@ -1,3 +1,6 @@
+/*
+연속 부분 수열 문제와 동일한 문제라고 생각하여 풀이를 진행하였습니다.
+ */
 function solution(queue1, queue2) {
   let answer = 0;
   const sum1 = queue1.reduce((acc, cur) => acc + cur, 0);
