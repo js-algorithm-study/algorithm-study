@@ -7,5 +7,3 @@
 3번 문제: https://school.programmers.co.kr/learn/courses/30/lessons/118668
 
 4번 문제: https://school.programmers.co.kr/learn/courses/30/lessons/17684
-
-5번 문제: https://school.programmers.co.kr/learn/courses/30/lessons/87946
