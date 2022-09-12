@@ -1,40 +1,49 @@
 function solution(n, info) {
-  let answer = [];
+  let answer = Array(11).fill(0);
   let max = 0;
-  info.forEach((c, i) => {
-    let remain = n;
-    let tmpAnswer = [];
-    let ryanSum = 0;
-    let apeachSum = 0;
-    info.forEach((count, index) => {
-      if (remain >= 0 && remain - count - 1 >= 0 && i - 1 !== index) {
-        remain = remain - count - 1;
-        tmpAnswer.push(count + 1);
-        ryanSum += 10 - index;
-      } else {
-        tmpAnswer.push(0);
-        if (count > 0) apeachSum += 10 - index;
-      }
 
-      if (index === info.length - 1) {
-        if (remain > 0) {
-          tmpAnswer[info.length - 1] = remain;
-        }
-        if (ryanSum - apeachSum > max) {
-          answer = [...tmpAnswer];
-          max = ryanSum - apeachSum;
-        }
-        if (ryanSum - apeachSum === max && max > 0) {
-          answer.forEach((a, index) => {
-            if (a < tmpAnswer[index + 9]) {
-              answer = [...tmpAnswer];
-            }
-          });
+  function dfs(v, apeachSum, ryanSum, remain, tmpAnswer) {
+    if (remain < 0) return;
+    if (v > 10) {
+      if (ryanSum - apeachSum > max) {
+        tmpAnswer[10] = remain;
+        max = ryanSum - apeachSum;
+        answer = [...tmpAnswer];
+      }
+      if (ryanSum - apeachSum === max) {
+        for (let i = 10; i > 0; i--) {
+          if (answer[i] > tmpAnswer[i]) {
+            break;
+          }
+          if (answer[i] < tmpAnswer[i]) {
+            answer = [...tmpAnswer];
+            break;
+          }
         }
       }
-    });
-  });
-  return answer.length === 0 ? [-1] : answer;
+      return;
+    }
+
+    // 라이언이 이긴 경우
+    let arr = [...tmpAnswer];
+    arr[v] = info[v] + 1;
+    dfs(v + 1, apeachSum, ryanSum + 10 - v, remain - info[v] - 1, arr);
+
+    // 어피치가 이긴 경우
+    if (info[v] > 0) {
+      dfs(v + 1, apeachSum + 10 - v, ryanSum, remain, tmpAnswer);
+    }
+    // 비긴 경우
+    else {
+      dfs(v + 1, apeachSum, ryanSum, remain, tmpAnswer);
+    }
+  }
+
+  dfs(0, 0, 0, n, answer);
+
+  return max === 0 ? [-1] : answer;
 }
 
-console.log(solution(3, [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]));
+// 1) 10+ 9 + // 8 +
+
+console.log(solution(3, [0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0]));
