@@ -1,3 +1,10 @@
+/* 
+각 노드들을 순회. 
+해당 노드가 이미 어딘가에 연결이 되어 있다면?? 굳이 체크할 필요가 없다.
+누군가와의 연결 true/ false 나타낸 배열 생성.
+해당 배열에서 false라면 DFS를 돌려서 연결상태를 추가해주고, answer++
+*/
+
 function solution(n, computers) {
   let answer = 0;
 
