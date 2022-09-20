@@ -20,9 +20,11 @@ function solution(maps) {
   queue = [[0, 0, 1]]; // i, j, cost
 
   while (queue.length > 0) {
-    let [p, q, cost] = queue.shift();
+    let [a, b, cost] = queue.shift();
 
-    if (p === n - 1 && q === m - 1) {
+    maps[a][b] = 0; // 막아주기.
+
+    if (a === n - 1 && b === m - 1) {
       return cost;
     }
 
@@ -30,20 +32,50 @@ function solution(maps) {
       return -1;
     }
 
-    const possible = [
-      [p - 1, q, cost],
-      [p + 1, q, cost],
-      [p, q - 1, cost],
-      [p, q + 1, cost],
+    // 이렇게하면 효율성 통과 하나도 못함..!!
+    // const possible = [
+    //   [p - 1, q, cost],
+    //   [p + 1, q, cost],
+    //   [p, q - 1, cost],
+    //   [p, q + 1, cost],
+    // ];
+
+    // for (let [a, b, cost] of possible) {
+    //   if (a < 0 || a >= n || b < 0 || b >= m) continue;
+    //   if (maps[a][b]) {
+    //     maps[p][q] = 0;
+    //     queue.push([a, b, cost + 1]);
+    //   }
+    // }
+
+    const d = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
     ];
 
-    for (let [a, b, cost] of possible) {
-      if (a < 0 || a >= n || b < 0 || b >= m) continue;
-      if (maps[a][b]) {
-        maps[p][q] = 0;
-        queue.push([a, b, cost + 1]);
+    // 다 통과.
+    // for (let i = 0; i < 4; i++) {
+    //   const [da, db] = d[i];
+    //   if (a + da < 0 || a + da >= n || b + db < 0 || b + db >= m) continue;
+    //   if (maps[a + da][b + db]) {
+    //     maps[a + da][b + db] = 0;
+    //     queue.push([a + da, b + db, cost + 1]);
+    //   }
+    // }
+
+    // 3번만 실패
+    d.forEach((distance) => {
+      const [da, db] = distance;
+      if (a + da < 0 || a + da >= n || b + db < 0 || b + db >= m) return 0;
+      if (maps[a + da][b + db]) {
+        maps[a + da][b + db] = 0;
+        queue.push([a + da, b + db, cost + 1]);
       }
-    }
+    });
+
+    // forEach의 퍼포먼스가 제일 빠르다고 알고 있었는데.... 어케된거지?
   }
 
   return answer;
