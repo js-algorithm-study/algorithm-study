@@ -38,7 +38,7 @@ function solution(tickets) {
 
   console.log("------");
 
-  return answer;
+  return answer[0];
 }
 
 // solution([
