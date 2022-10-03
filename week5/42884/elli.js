@@ -1,65 +1,35 @@
-// @ts-nocheck
-/* 
-고속도로를 이동하는 차량의 경로 routes가 매개변수로 주어질 때,
-모든 차량이 한 번은 단속용 카메라를 만나도록 하려면 최소 몇 대의 카메라를 설치해야 하는지
-
-route[i] [0,1] [진입시점,나간시점]
-진출, 진입지점에서 카메라 만나도 OK
-
-달아야 하는 카메라 최소로.
-
-그리디. 선형. 최소.
-
-*/
-
 function solution(routes) {
-  let answer = 0;
+  let answer = 1;
+  // 진출시점 정렬
+  routes.sort((a, b) => a[1] - b[1]);
 
-  // 진입 시점 기준으로 정렬
-  routes.sort((a, b) => a[0] - b[0]);
+  let minExit = routes[0][1]; // 시작이 1인 이유.
 
-  let check = new Array(routes.length).fill(0);
+  // 핵심은 routes를 돌면서 이미 포함한 route들은 확실하게 체크 안 하는 것. (checkedRoute로 성취)
 
-  // 진입과 진출만 체크하자.
-  let points = [];
-  routes.forEach((route) => {
-    points.push(route[1]);
-  });
+  let checkedRoute = 0; // count하면 이 index를 올려서 이미 포함된 route 체크 안 하게!!
 
-  points.sort((a, b) => a - b);
+  while (checkedRoute !== routes.length) {
+    for (let i = checkedRoute; i < routes.length; i++) {
+      const [start, end] = routes[i];
+      // console.log(start, end, minExit);
 
-  console.log(points);
-
-  let x = 0;
-  while (x < points.length) {
-    let point = points[x];
-
-    let flag = false;
-    for (let k = 0; k < check.length; k++) {
-      if (isIn(routes[k], point)) {
-        if (check[k] === 0) {
-          check[k] = 1;
-          console.log(routes[k], point);
-          flag = true;
-        }
+      if (minExit >= start && minExit <= end) {
+        console.log("include");
+        checkedRoute++;
+      } else {
+        console.log("exclude");
+        // 이미 포함한 route는 제외했으니 가장 마지막 진출시점보다 뒤에 있는 route. 여기에 카메라 설치.
+        minExit = end;
+        answer++;
+        checkedRoute = i;
+        break;
       }
     }
-    if (flag) answer++;
-    x++;
   }
 
   console.log(answer);
-
   return answer;
-}
-
-function isIn(route, target) {
-  const [start, end] = route;
-  if (target >= start && target <= end) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 // solution([
