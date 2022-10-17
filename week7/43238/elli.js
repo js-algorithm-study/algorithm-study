@@ -18,72 +18,40 @@ n명이 대기중.
 
 sort한 다음 작은 수부터 체크해서 x와 x+1을 비교. (1,5) (2,4) ... 해서 가장 작은수를 저장.
 x++한 다음 반복
+
+이분탐색. start와 end를 잡아서 쪼여오면서 답 찾기!!!
 */
 
 function solution(n, times) {
   let answer = 0;
 
-  times.sort((a, b) => b - a); // time 순서대로
+  let start = Math.min(...times);
+  let end = Math.max(...times) * n; // 최대 시간 걸리는 곳 * n
 
-  let x = 0;
+  while (start < end) {
+    let mid = Math.floor((start + end) / 2);
 
-  let result = new Array(times.length).fill(0);
+    // mid
+    let count = times.reduce((prev, curr) => prev + Math.floor(mid / curr), 0);
 
-  if (n > times.length) {
-    result[0] = n > times.length ? n - (times.length - 1) : 0;
-  }
-
-  console.log(result, "before");
-
-  let min = Infinity;
-  while (x < times.length) {
-    const sumExceptX = result.reduce(
-      (prev, curr, idx) => (idx !== x && idx !== x + 1 ? prev + curr : 0),
-      0
-    );
-    console.log("x", x, sumExceptX);
-
-    let a = 0;
-    let b = 0;
-    split(n - sumExceptX).forEach((ele) => {
-      const [first, second] = ele;
-      const sum = Math.max(first * times[0], second * times[1]);
-      console.log("first:", first, times[0], "second:", second, times[1], sum);
-      if (min > sum) {
-        min = sum;
-        a = first;
-        b = second;
-      }
-    });
-    if (a !== 0 && b !== 0) {
-      result[x] = a;
-      result[x + 1] = b;
+    if (count >= n) {
+      end = mid;
+    } else if (count < n) {
+      start = mid;
     }
-    console.log(result, "result");
-    x++;
+    if (end === start + 1) {
+      answer = end;
+      break;
+    }
   }
 
-  console.log(min);
+  console.log(answer);
 
-  return min;
+  return answer;
 }
 
-function split(num) {
-  console.log("num", num);
-  const result = [];
-  let opponent = 1;
-
-  while (num > 1) {
-    result.push([num - 1, opponent]);
-    num--;
-    opponent++;
-  }
-
-  return result;
-}
-
-// solution(6, [10, 7]); //28
+solution(6, [10, 7]); //28
 
 // solution(4, [1, 2, 3]); //3
 
-solution(4, [3, 6, 7]); // 7
+// solution(4, [3, 6, 7]); // 7
