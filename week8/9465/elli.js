@@ -31,7 +31,7 @@ dp[4]를 위해 dp[1] dp[2] dp[3]이 필요하다!
 let fs = require("fs");
 let path = "/dev/stdin";
 
-let testPath = "./test.txt";
+let testPath = "../test.txt";
 
 // let input = fs.readFileSync(path).toString().split(" ");
 let inputs = fs.readFileSync(testPath).toString().split("\r\n"); // linux \n window \r\n
