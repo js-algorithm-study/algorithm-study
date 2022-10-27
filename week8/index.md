@@ -4,3 +4,5 @@
 2. https://www.acmicpc.net/problem/11053
 3. https://www.acmicpc.net/problem/2579
 4. https://www.acmicpc.net/problem/2156
+5. https://www.acmicpc.net/problem/11066
+6. https://www.acmicpc.net/problem/2293
