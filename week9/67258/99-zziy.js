@@ -53,6 +53,3 @@ console.log(
     "RUBY",
   ])
 );
-/* console.log(solution(["AA", "AB", "AC", "AA", "AC"]));
-console.log(solution(["XYZ", "XYZ", "XYZ"]));
-console.log(solution(["ZZZ", "YYY", "NNNN", "YYY", "BBB"])); */
