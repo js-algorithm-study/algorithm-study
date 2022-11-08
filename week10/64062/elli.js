@@ -18,40 +18,48 @@ min, max의 중간부터 시작해서 divide / conquer을 할까??
 
 k개의 수를 고정으로 한 슬라이딩 윈도우를 해보라네.
 
+그냥 중간부터 이분탐색만 생각했지
+
+이분탐색으로 해결. 이분탐색 오랜만이라 어케하는지 까먹었었다. 기억해두자!!
+
+슬라이딩 윈도우로 구현하려했는데 배열이라서 그런지 시간 오바 나더라고..
+
+
 */
 
-function solution(stones, k) {
-  var answer = 0;
+function check(stones, k, x) {
+  let count = 0;
 
-  let flag = true;
-
-  let min = Math.min(...stones);
-
-  answer = min;
-
-  while (flag) {
-    let count = 0;
-
-    for (let i = 0; i < stones.length; i++) {
-      let stone = stones[i];
-      if (stone <= answer) {
-        count++;
-      } else {
-        count = 0;
-      }
-      if (count >= k) {
-        flag = false;
-        break;
-      }
+  for (let i = 0; i < stones.length; i++) {
+    if (stones[i] <= x) {
+      count++;
+    } else {
+      count = 0;
     }
-
-    answer++;
+    if (count >= k) {
+      return false;
+    }
   }
 
-  // 안되기 직전 return
-  console.log(answer - 1);
+  return true;
+}
 
-  return answer - 1;
+function solution(stones, k) {
+  let start = 0;
+  let end = 200000000;
+
+  while (start <= end) {
+    let mid = start + Math.floor((end - start) / 2);
+
+    if (check(stones, k, mid)) {
+      start = mid + 1;
+    } else {
+      end = mid - 1;
+    }
+  }
+
+  console.log(start);
+  return start;
 }
 
 solution([2, 4, 5, 3, 2, 1, 4, 2, 5, 1], 3);
