@@ -1,32 +1,35 @@
 const solution = (stones, k) => {
   let answer = 0;
-  let i = 0;
-  let tmp = Array(stones.length).fill(0);
-  let isRun = true;
+  let left = 0;
+  let right = Math.max(...stones);
 
-  while (isRun) {
-    if (stones[i] >= 1) {
-      stones[i] -= 1;
-      tmp[i] = 1;
-      i++;
-    } else {
-      i++;
-    }
-    if (i >= stones.length) {
-      for (let j = 0; j < stones.length - k; j++) {
-        if (tmp.slice(j, j + k).findIndex((s) => s !== 0) === -1) {
-          isRun = false;
-          break;
+  const isCross = (stones, step) => {
+    let j = 0;
+    for (let i = 0; i < stones.length; i++) {
+      stones[i] -= step;
+      if (stones[i] < 0) {
+        j++;
+        if (j >= k) {
+          return false;
         }
+      } else {
+        j = 0;
       }
-      if (isRun) {
-        answer++;
-        i = 0;
-        tmp = Array(stones.length).fill(0);
-      }
+    }
+    return true;
+  };
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    if (isCross([...stones], mid)) {
+      answer = mid;
+      left = mid + 1;
+    } else {
+      right = mid - 1;
     }
   }
+
   return answer;
 };
 
-console.log(solution([2, 4, 5, 3, 2, 1, 4, 2, 5, 1], 9));
+console.log(solution([2, 4, 5, 3, 2, 1, 4, 2, 5, 1], 3));
