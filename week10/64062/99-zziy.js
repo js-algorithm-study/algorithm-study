@@ -1,7 +1,7 @@
 const solution = (stones, k) => {
   let answer = 0;
   let left = 0;
-  let right = Math.max(...stones);
+  let right = 200000000;
 
   const isCross = (stones, step) => {
     let j = 0;
@@ -32,4 +32,4 @@ const solution = (stones, k) => {
   return answer;
 };
 
-console.log(solution([2, 4, 5, 3, 2, 1, 4, 2, 5, 1], 3));
+console.log(solution([2, 4, 5, 3, 2, 1, 4, 2, 5], 3));
