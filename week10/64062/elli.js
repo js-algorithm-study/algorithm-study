@@ -51,6 +51,7 @@ function solution(stones, k) {
   while (start <= end) {
     let mid = start + Math.floor((end - start) / 2);
 
+		// check이면 k에 모자란 것. 그러면 늘려줘야지!!
     if (check(stones, k, mid)) {
       start = mid + 1;
     } else {
