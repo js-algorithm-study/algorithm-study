@@ -1,33 +1,18 @@
 const solution = (n, stations, w) => {
   let answer = 0;
-  let check = Array(n).fill(0);
-  let splitArr = [];
-  let temp = [];
+  let arr = [0, ...stations];
 
-  for (let i = 0; i < stations.length; i++) {
-    for (let j = stations[i] - w - 1; j <= stations[i] + w - 1; j++) {
-      if (j >= 0 && j < n) {
-        check[j] = 1;
-      }
+  for (let i = 0; i < arr.length; i++) {
+    let gap = 0;
+    if (i === 0) {
+      gap = arr[i + 1] - w - 1;
+    } else if (i === arr.length - 1) {
+      gap = n - arr[i] - w;
+    } else {
+      gap = arr[i + 1] - w - (arr[i] + w + 1);
     }
-  }
 
-  for (let i = 0; i < n; i++) {
-    if (check[i] === 0) {
-      temp.push(i);
-    }
-    if (check[i] === 1) {
-      splitArr.push(temp);
-      temp = [];
-    }
-  }
-  splitArr.push(temp);
-
-  for (let i = 0; i < splitArr.length; i++) {
-    if (splitArr.length) {
-      const length = Math.ceil(splitArr[i].length / (2 * w + 1));
-      answer += length;
-    }
+    if (gap > 0) answer += Math.ceil(gap / (2 * w + 1));
   }
 
   return answer;
