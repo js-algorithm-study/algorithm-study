@@ -34,12 +34,15 @@ function solution(info, query) {
     queries.push([language, job, career, food, score]);
   }
 
+  informations.sort((a, b) => a[4] - b[4]);
+
   for (let q = 0; q < queries.length; q++) {
     const [language, job, career, food, score] = queries[q];
     // console.log(queries[q]);
 
     let arr = informations;
 
+    // query를 미리 좀 걷어내는 것이 핵심인가..?
     arr = arr.filter((ele) => Number(ele[4]) >= Number(score));
 
     if (language !== "-") {
