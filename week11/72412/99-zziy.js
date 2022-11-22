@@ -1,45 +1,44 @@
 function solution(infos, queries) {
   let answer = Array(queries.length).fill(0);
-  let infoArr = [];
-  let queryArr = [];
+  let arr = [];
 
-  infos.forEach((info) => {
-    let str = "";
-    let score = 0;
-    info.split(" ").forEach((i, index) => {
-      if (index === info.split(" ").length - 1) return (score = i);
-      return (str += i[0]);
-    });
-    infoArr.push({ data: str, score: score });
+  queries = queries.map((query) => {
+    if (query.includes("and")) {
+      return (query = query.replace(/ and/g, ""));
+    }
   });
 
-  queries.forEach((query) => {
-    let str = "";
-    let score = 0;
-    query.split(" ").forEach((q, index) => {
-      if (q === "and") return;
-      if (q === "-") return (str += "*");
-      if (index === query.split(" ").length - 1) return (score = q);
-      return (str += q[0]);
-    });
-    queryArr.push({ data: str, score: score });
-  });
+  const queue = [queries[0]];
 
-  queryArr.forEach((query, qIdx) => {
-    infoArr.forEach((info) => {
-      let flag = true;
-      for (let i = 0; i < 4; i++) {
-        if (query.data[i] === "*") continue;
-        if (query.data[i] !== info.data[i]) {
-          flag = false;
-          break;
-        }
-      }
-      if (flag && Number(query.score) <= Number(info.score)) {
-        answer[qIdx]++;
-      }
-    });
-  });
+  while (queue.length || queries.length) {
+    const query = queue.shift();
+    const [language, position, career, food, score] = query.split(" ");
+    if (!query.includes("-")) {
+      arr.push(query);
+    }
+    if (language === "-") {
+      queue.push(query.replace("-", "cpp"));
+      queue.push(query.replace("-", "java"));
+      queue.push(query.replace("-", "python"));
+    }
+    if (position === "-") {
+      queue.push(query.replace("-", "backend"));
+      queue.push(query.replace("-", "frontend"));
+    }
+    if (career === "-") {
+      queue.push(query.replace("-", "junior"));
+      queue.push(query.replace("-", "senior"));
+    }
+    if (food === "-") {
+      queue.push(query.replace("-", "chicken"));
+      queue.push(query.replace("-", "pizza"));
+    }
+    if (queue.length === 0 && queries.length) {
+      queue.push(queries.shift());
+    }
+  }
+  console.log(arr);
+
   return answer;
 }
 
