@@ -17,7 +17,7 @@ filtering으로 이중 for문을 만들었는데 그래도 효율성 실패가 �
 
 	{
 		javabackendjuniorpizza: [150] ,
-		pythonfrontendseniorchicken: [150, 210] ,
+		pythonfrontendseniorchicken: [150, 210]
 		cppbackendseniorpizza: [260] ,
 		javabackendjuniorchicken: [80] ,
 		pythonbackendseniorchicken: [50] 

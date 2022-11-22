@@ -28,7 +28,6 @@ costs 순서대로 정렬 후, 하나씩 연결시켜보면서 BFS를 돌려볼�
 이 때, 싸이클을 만들지 않는 방법은? 즉, 기존의 연결 노드들과 연관이 없는 간선을 어떻게 골라내는가?
 
 Union & Find 방법을 사용!
-
 */
 
 /**
@@ -127,6 +126,7 @@ function solution2(n, costs) {
   console.log("s2", answer);
   return answer;
 }
+
 solution(4, [
   [0, 1, 1],
   [0, 2, 2],
