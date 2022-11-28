@@ -10,6 +10,7 @@ function solution(n, edge) {
     graph[b][a] = 1;
   } */
 
+  // 인접리스트
   for (let [a, b] of edge) {
     graph[a].push(b);
     graph[b].push(a);
