@@ -49,7 +49,7 @@ function solution(playTime, advTime, logs) {
 
   // imos : 시작 +1, 종료 -1 상태
 
-  // 광고 시간의 누적합
+  // 해당 시간에 겹친 유저 누적합
   for (let i = 1; i <= playTimeNum; i++) {
     imos[i] += imos[i - 1];
   }
