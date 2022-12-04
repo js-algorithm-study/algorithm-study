@@ -16,64 +16,70 @@
 - 시작만 체크한다는 점은 맞으나, for문을 돌면서 시작 시간을 넣고 하나씩 체크하는 것이 아니라, 
 시작과 끝 시간을 담은 배열을 만들어서 해당 구간에 몇 명이 들어있는지 체크한다. 
 
+#Imos 알고리즘
+
+누적합의 개념을 모르다보니 접근하기 어려웠다..ㅠㅜ
+
+- https://velog.io/@longroadhome/%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%A8%B8%EC%8A%A4-LV.3-%EA%B4%91%EA%B3%A0-%EC%82%BD%EC%9E%85-JS
+
 */
 
 function solution(playTime, advTime, logs) {
   let answer = 0;
-  let ansStart = 0;
-
-  // advTime이 들어갈 수 있는.
-  let possibleTimes = [0, changeTime(playTime) - changeTime(advTime)];
-
-  let changedLogs = logs.map((log) => {
-    const [start, end] = log.split("-");
-    return [changeTime(start), changeTime(end)];
-  });
-
-  let target = [0, ...changedLogs.map((a) => a[0]), possibleTimes[1]].sort(
-    (a, b) => a - b
-  );
-
-  // 각 logs들의 시작 + possibleTimes 점검
-  for (let j = 0; j < target.length; j++) {
-    const start = target[j];
-
-    if (start > possibleTimes[1]) break; // 의미 없는 시간대
-
-    const t = calculateTime(start, changeTime(advTime), changedLogs);
-    if (t > answer) {
-      answer = t;
-      ansStart = start;
-    }
-  }
-
-  console.log(answer, ansStart, changeTimeString(ansStart), "ans");
-
-  return changeTimeString(ansStart);
-}
-
-function calculateTime(advStartTime, advDuration, changedLogs) {
   let time = 0;
 
-  // console.log("asvStart", advStartTime, changeTimeString(advStartTime));
+  const playTimeNum = changeTime(playTime);
+  const advTimeNum = changeTime(advTime);
+  const imos = Array(playTimeNum + 1).fill(0);
 
-  for (let i = 0; i < changedLogs.length; i++) {
-    const [logStart, logEnd] = changedLogs[i];
-    const advStart = advStartTime;
-    const advEnd = advStartTime + advDuration;
+  if (playTime === advTime) {
+    return "00:00:00";
+  }
 
-    if (
-      (logStart <= advStart && advStart <= logEnd) ||
-      (logStart <= advEnd && advEnd <= logEnd)
-    ) {
-      const start = Math.max(advStartTime, logStart);
-      const end = Math.min(advStartTime + advDuration, logEnd);
+  // imos는 00:00:00 ~ playTime 까지 매 초마다 0을 지는 array
+  for (let i = 0; i < logs.length; i++) {
+    const [start, end] = logs[i].split("-");
+    const s = changeTime(start);
+    const e = changeTime(end);
 
-      time = time + end - start;
+    // 각 시작, 종료 시각마다 ++, --
+    imos[s]++;
+    imos[e]--;
+  }
+
+  // imos : 시작 +1, 종료 -1 상태
+
+  // 광고 시간의 누적합
+  for (let i = 1; i <= playTimeNum; i++) {
+    imos[i] += imos[i - 1];
+  }
+
+  // imos : 현재 시각에 몇명 들어있는지
+
+  // 누적된 광고 시간의 누적합의 누적합
+  for (let i = 1; i <= playTimeNum; i++) {
+    imos[i] += imos[i - 1];
+  }
+
+  // imos : 현재 시각에 몇명 * 1초의 합
+
+  let sum = imos[advTimeNum - 1];
+  console.log(imos[advTimeNum]);
+
+  // advTimeNum부터 시작이유 : 0~advTime까지 광고인 경우.
+  for (let i = advTimeNum - 1; i < playTimeNum; i++) {
+    // [3~5] = [0~5] - [0~(5-3)];
+    const aT = imos[i] - imos[i - advTimeNum];
+
+    if (sum < aT) {
+      sum = aT;
+      time = i - advTimeNum + 1; // 시작시간 포함
     }
   }
 
-  return time;
+  console.log(time, changeTimeString(time));
+
+  return answer;
 }
 
 /**
@@ -103,13 +109,13 @@ function changeTimeString(time) {
   return `${hour}:${minute}:${second}`;
 }
 
-// solution("02:03:55", "00:14:15", [
-//   "01:20:15-01:45:14",
-//   "00:40:31-01:00:00",
-//   "00:25:50-00:48:29",
-//   "01:30:59-01:53:29",
-//   "01:37:44-02:02:30",
-// ]); // "01:30:59"
+solution("02:03:55", "00:14:15", [
+  "01:20:15-01:45:14",
+  "00:40:31-01:00:00",
+  "00:25:50-00:48:29",
+  "01:30:59-01:53:29",
+  "01:37:44-02:02:30",
+]); // "01:30:59"
 
 // solution("99:59:59", "25:00:00", [
 //   "69:59:59-89:59:59",
@@ -123,5 +129,3 @@ function changeTimeString(time) {
 //   "10:14:18-15:36:51",
 //   "38:21:49-42:51:45",
 // ]); // "00:00:00"
-
-solution("25:00:00", "00:01:00", ["24:00:01-25:00:00"]); //"24:00:01"
