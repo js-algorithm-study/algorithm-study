@@ -79,7 +79,7 @@ function solution(playTime, advTime, logs) {
 
   console.log(time, changeTimeString(time));
 
-  return answer;
+  return changeTimeString(time);
 }
 
 /**

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* 
 - 죠르디는 출발점인 (0, 0) 칸에서 출발한 자동차가 도착점인 (N-1, N-1) 칸까지 중간에 끊기지 않도록 경주로를 건설
 - 인접한 두 빈 칸을 상하 또는 좌우로 연결한 경주로를 직선 도로
@@ -9,177 +10,73 @@ DFS로 가능한 경우 다 구해서.. 직선과 곡선 구하기.?
 배열에 그동안 지나온 경로 적기
 
 DFS로 가능한 모든거 구하면 시간 초과...
+
+BFS 다익스트라로 하면 풀린다는데?? + DP
+
+#해답 : https://school.programmers.co.kr/questions/40589
+
+BFS + DP의 구성으로 하는 거였음. 
+이 때, dp에는 cost와 direction을 같이 저장해야함. 최소 비용이어야만 dp를 교체가능하고 
+직선 방향인지, 꺾이는 방향인지에 따라서 cost가 달라지기 때문에 [n-1][n-1]에 도달했어도 
+direction에 따라 cost가 달라짐
+
 */
 
 function solution(board) {
-  let answer = Infinity;
+  const N = board.length;
 
-  let possibles = [];
+  // [x][y][direction] 3차원 dp
+  let dp = Array(N)
+    .fill()
+    .map(() =>
+      Array(N)
+        .fill()
+        .map(() => Array(4).fill(Infinity))
+    );
 
-  DFS(board, [[0, 0]], possibles);
+  // DIRECTIONS 배열의 index가 실제 방향을 탐색하는데 쓰이는 값이다. 오/왼/위/아래 -> 0/1/2/3
+  const DIRECTIONS = [
+    [1, 0],
+    [-1, 0],
+    [0, -1],
+    [0, 1],
+  ];
 
-  // console.log(possibles, "possibles");
+  const isValid = (x, y) =>
+    x >= 0 && x < N && y >= 0 && y < N && board[x][y] !== 1;
+  // 초기값은 0,0에서 오른쪽 / 아래로 이동하는 경우만 지정한다.
+  // [x좌표, y좌표, cost, direction]
 
-  possibles.forEach((p) => {
-    let price = calculate(p);
-    if (price < answer) answer = price;
-  });
-  // console.log(answer, "ans");
+  const queue = [
+    [0, 0, 0, 0],
+    [0, 0, 0, 3],
+  ];
 
-  return answer;
+  // 무작정 짧은 경로가 아니라, 도로의 종류에 따라 비용이 달라지므로 방문여부 체크를 하면 X
+  // 먼저 도달했다고 최소비용 경로가 아님.
+  // board의 좌표마다 최소비용을 담아냄.
+  // 도로를 방문한적 없거나 이전 보다 최소비용으로 도달하면,
+  while (queue.length) {
+    const [x, y, cost, dir] = queue.shift();
+
+    for (let i = 0; i < DIRECTIONS.length; i++) {
+      const [mx, my] = DIRECTIONS[i];
+      const [_x, _y] = [x + mx, y + my];
+      if (isValid(_x, _y)) {
+        let new_cost = cost + 100;
+        // 진행하는 방향과 다른 방향은 회전하는 방향이다.
+        if (dir !== i) new_cost += 500;
+        // 되돌아가는 방향의 cost는 무조건 new_cost보다 작기때문에 왔던 방향은 이조건에서 제외된다.
+        if (new_cost < dp[_x][_y][i]) {
+          dp[_x][_y][i] = new_cost;
+          queue.push([_x, _y, new_cost, i]);
+        }
+      }
+    }
+  }
+
+  return Math.min(...dp[N - 1][N - 1]);
 }
-
-function DFS(board, routes, possibles) {
-  const node = routes[routes.length - 1];
-  const [x, y] = node;
-  // console.log("x", x, "y", y);
-
-  if (x === board.length - 1 && y === board.length - 1) {
-    possibles.push(routes);
-    // console.log("x === board.length - 1 && y === board.length - 1");
-    return;
-  }
-
-  const paths = getPath(x, y, board.length - 1);
-
-  let filtered = paths.filter(([a, b]) => board[a][b] === 0);
-
-  // console.log(filtered, "filtered");
-
-  if (filtered.length === 0) {
-    possibles.push(routes);
-    // console.log("filtered.length === 0");
-    return;
-  }
-
-  for (let i = 0; i < filtered.length; i++) {
-    const [a, b] = filtered[i];
-    if (board[a][b] === 0) {
-      // console.log("a", a, "b", b);
-      if (a === x && b === y) continue;
-
-      let past = routes.filter((route) => route[0] === a && route[1] === b);
-
-      if (past.length > 0) continue;
-
-      let newRoutes = [...routes, [a, b]];
-      DFS(board, newRoutes, possibles);
-    }
-  }
-}
-
-/**
- *
- * @param {Array} array
- */
-function calculate(array) {
-  let direct = 0;
-  let corner = 0;
-
-  direct = array.length - 1;
-
-  for (let i = 0; i < array.length; i++) {
-    // 3개를 이어서 보자
-    if (i + 2 > array.length - 1) break;
-
-    const [x, y] = array[i];
-    const [nextX, nextY] = array[i + 2];
-
-    if (nextX - x === 2 || nextY - y === 2) {
-      continue;
-    } else {
-      corner++;
-    }
-  }
-
-  return direct * 100 + corner * 500;
-}
-
-/**
- *
- * @param {number} x
- * @param {number} y
- * @param {number} max
- * x+1 y / x-1, y / x y+1 / x Y-1
- */
-function getPath(x, y, max) {
-  if (x === 0) {
-    if (y === 0) {
-      return [
-        [x + 1, y],
-        [x, y + 1],
-      ];
-    }
-    if (y > 0 && y < max) {
-      return [
-        [x + 1, y],
-        [x, y - 1],
-        [x, y + 1],
-      ];
-    }
-    if (y === max) {
-      return [
-        [x + 1, y],
-        [x, y - 1],
-      ];
-    }
-  }
-
-  if (x > 0 && x < max) {
-    if (y === 0) {
-      return [
-        [x - 1, y],
-        [x + 1, y],
-        [x, y + 1],
-      ];
-    }
-    if (y > 0 && y < max) {
-      return [
-        [x - 1, y],
-        [x + 1, y],
-        [x, y - 1],
-        [x, y + 1],
-      ];
-    }
-    if (y === max) {
-      return [
-        [x - 1, y],
-        [x + 1, y],
-        [x, y - 1],
-      ];
-    }
-  }
-
-  if (x === max) {
-    if (y === 0) {
-      return [
-        [x - 1, y],
-        [x, y + 1],
-      ];
-    }
-    if (y > 0 && y < max) {
-      return [
-        [x - 1, y],
-        [x, y - 1],
-        [x, y + 1],
-      ];
-    }
-    if (y === max) {
-      return [
-        [x - 1, y],
-        [x, y - 1],
-      ];
-    }
-  }
-
-  return [];
-}
-
-// solution([
-//   [0, 0, 0],
-//   [0, 0, 0],
-//   [0, 0, 0],
-// ]); // 900
 
 solution([
   [0, 0, 0, 0, 0, 0, 0, 1],
