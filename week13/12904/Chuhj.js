@@ -63,19 +63,49 @@
 //   return answer;
 // }
 
+// function solution(s) {
+//   // 효율 1번만 통과
+//   let answer = 1;
+
+//   if (s.length === 1) return 1;
+
+//   if (s.length === 2) return s[0] === s[1] ? 2 : 1;
+
+//   for (let len = 3; len < s.length; len++) {
+//     for (let i = 0; i <= s.length - len; i++) {
+//       const mid = i + Math.floor(len / 2);
+//       let left = mid - 1;
+//       let right = len % 2 === 0 ? mid : mid + 1;
+
+//       while (left >= 0 && right < s.length) {
+//         if (s[left] !== s[right]) {
+//           break;
+//         }
+//         left -= 1;
+//         right += 1;
+//       }
+//       const palinLen = right - left - 1;
+//       answer = palinLen > answer ? palinLen : answer;
+//     }
+//   }
+
+//   return answer;
+// }
+
 function solution(s) {
-  // 효율 1번만 통과
   let answer = 1;
 
   if (s.length === 1) return 1;
 
   if (s.length === 2) return s[0] === s[1] ? 2 : 1;
 
-  for (let len = 3; len < s.length; len++) {
+  for (let len = 3; len <= s.length; len++) {
     for (let i = 0; i <= s.length - len; i++) {
       const mid = i + Math.floor(len / 2);
       let left = mid - 1;
       let right = len % 2 === 0 ? mid : mid + 1;
+
+      if (len < answer) continue;
 
       while (left >= 0 && right < s.length) {
         if (s[left] !== s[right]) {
